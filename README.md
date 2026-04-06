@@ -93,6 +93,8 @@ Desktop		Downloads	Movies		OrbStack	Public
 
 ```
 
+- rm -rf [디렉토리]
+    - -f : 실제로 삭제할지 물어보는 경우 강제 실행
 - 파일 내용 확인, 빈 파일 생성
 
 ```jsx
@@ -138,6 +140,9 @@ total 0
 drwxrwxrwx  2 jeay5290857  jeay5290857  64 Mar 30 20:11 a
 -rwxrwxrwx  1 jeay5290857  jeay5290857   0 Mar 30 20:06 a.txt
 ```
+
+- umask
+- run.cpp 실행 권한이 있어도 read권한이 없으면 동작 불가
 
 ### 3-3. Docker 설치/점검
 
@@ -393,8 +398,6 @@ root@2758111624ba:/# pwd
             ```
             
         - docker kill [컨테이너이름] : 즉시 종료
-            - attach중이었다면 메인 프로세스 종료 → 컨테이너 종료
-            - exec중이었다면 bash만 종료 → 컨테이너는 유지될 수 도 있음
             
             ```jsx
             jeay5290857@c4r2s5 ~ % docker kill myubuntu2
@@ -405,8 +408,10 @@ root@2758111624ba:/# pwd
     - 유지
         - attach : 원래 실행 중인 프로세스에 그대로 붙음, 새로운 셸x
             - 위험, 잘못 종료 시 컨테이너 종료 가능
-        - exit : exec : 컨테이너 안에서 새로운 bash셸 실행
+            - pid1인 init프로세스에 연결
+        - exec : 컨테이너 안에서 새로운 bash셸 실행
             - 안전, 사용 다
+            - 새로운 pid를 받아 새로운 프로세스를 생성
 
 ```jsx
 jeay5290857@c4r2s5 ~ % docker run -it --name myubuntu1 ubuntu bash
@@ -553,6 +558,8 @@ bc0464938172   ubuntu    "bash"    2 minutes ago   Up 2 minutes             myub
 - 8080:80
     - 브라우저에서 내 컴퓨터에서 접속하는 포트
     - 내 컴퓨터에서 컨테이너 내부 웹서버(nginx)가 사용하는 포트
+- lsof -i:[port_num]
+    - 사용중인 포트 검색
 - 호스트IP와 컨테이너 IP를 분리
     - 보안 : 필요한 포트만 노출
     - 충돌 방지 : 여러 컨테이너가 같은 포트를 사용 가능 방지
@@ -570,13 +577,14 @@ bc0464938172   ubuntu    "bash"    2 minutes ago   Up 2 minutes             myub
     fd407b4526143e16191d534262eb4815db322b4bc876a002b4a1714f5d9f4b6b
     ```
     
+    - 최근에는 —mount 옵션으로 명확히 해주기도 함
 
 ### 3-8. 볼륨 영속성
 
 - 도커 볼륨
     - 저장 공간
     - 컨테이너 밖에서 도커가 관리
-    - 컨테이너 삭제 후에도 데이터는 유지됨
+    - 컨테이너 삭제 후에도 데이터는 유지됨`
 - Docker 볼륨을 생성하고 컨테이너에 연결한다.
     
     ```jsx
