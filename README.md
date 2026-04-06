@@ -257,6 +257,8 @@ WARNING: DOCKER_INSECURE_NO_IPTABLES_RAW is set
 //OrbStack 환경에서 iptables 관련 warning이 표시되었으나 기본 컨테이너 실행 및 네트워크 동작에는 영향이 없음을 확인하였다.
 ```
 
+- 리눅스 보안 때문에 방화벽 iptables가 비활성화되어 있어서 나는 경고
+- 실제 과제 수행에 있어서 관련없음
 - 이미지 : 다운로드/목록 확인(예: docker images)
 
 ```jsx
@@ -460,11 +462,14 @@ bc0464938172   ubuntu    "bash"    2 minutes ago   Up 2 minutes             myub
     docker-workstation/
     ├── Dockerfile
     ├── [README.md](http://readme.md/)
-    ├── app/
+    ├── src/
     │   └── index.html
-    └── screenshots/
+    └── screenshots/ 
     ```
     
+    - 파일을 기능별로 분리해서 재현성과 가독성을 높임
+        - /app : 백엔드 파일
+        - /src : 프론트 파일
 - 내가 적용한 커스텀 포인트 각각의 목적(간단 요약)
     - index.html
         - 기본 nginx 페이지 대신 app/index.html 파일을 복사하여 사용자 정의 웹 페이지가 출력되도록 하였다.
@@ -533,6 +538,7 @@ bc0464938172   ubuntu    "bash"    2 minutes ago   Up 2 minutes             myub
             a0ca73d9d70a   my-web:1.0   "/docker-entrypoint.…"   9 minutes ago   Up 9 minutes   0.0.0.0:8080->80/tcp, [::]:8080->80/tcp   my-web
             ```
             
+    - dockerfile -빌드→ 이미지 -run→ 컨테이너
 
 ### 3-6. 포트 매핑 접속(2회)
 
@@ -547,6 +553,12 @@ bc0464938172   ubuntu    "bash"    2 minutes ago   Up 2 minutes             myub
 - 8080:80
     - 브라우저에서 내 컴퓨터에서 접속하는 포트
     - 내 컴퓨터에서 컨테이너 내부 웹서버(nginx)가 사용하는 포트
+- 호스트IP와 컨테이너 IP를 분리
+    - 보안 : 필요한 포트만 노출
+    - 충돌 방지 : 여러 컨테이너가 같은 포트를 사용 가능 방지
+    - 명시성 : 어떤 포트를 외부에 공개할지 명확
+- 여러 컨테이너를 연속으로 돌리다니 보니 이미 사용중인 포트라는 경고
+    - docker ps로 확인 후 사용하지 않는 컨테이너는 삭제하고 다시 실행
 
 ### 3-7. 바인드 마운트 반영
 
